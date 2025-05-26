@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator,
   Platform, KeyboardAvoidingView, 
-  ScrollView} from 'react-native';
+  ScrollView, Dimensions} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSignup } from '../hooks/useSignup';
 import { useNavigation } from '@react-navigation/native';
@@ -14,6 +14,8 @@ type RootStackParamList = {
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Signup'>;
+
+const { height } = Dimensions.get('window');
 
 export const SignupScreen = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -46,30 +48,35 @@ export const SignupScreen = () => {
       className="flex-1 bg-white"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <ScrollView
-        className="flex-1 p-4"
-        contentContainerClassName="flex-1 justify-center"
+        className="flex-1"
+        contentContainerStyle={{
+          minHeight: height,
+          paddingHorizontal: 24,
+        }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="flex-1 justify-center px-6 py-8">
-
+        <View className="flex-1 justify-center py-12">
           {/* ヘッダー部分 */}
-          <View className="mb-6">
-            <View className="w-20 h-20 bg-green-500 rounded-full items-center justify-center mx-auto">
-              <Text className="text-white text-2xl font-bold">+</Text>
+          <View className="mb-12 items-center">
+            <View className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-3xl items-center justify-center mb-6 shadow-lg">
+              <Text className="text-white text-3xl">+</Text>
             </View>
-            <Text className="text-3xl text-center font-bold text-gray-800 mb-2">アカウント作成</Text>
+            <Text className="text-4xl font-bold text-gray-800 mb-2">アカウント作成</Text>
+            <Text className="text-gray-500 text-center">
+              新しいアカウントを作成して、作業を始めましょう
+            </Text>
           </View>
 
           {/* フォーム部分 */}
-          <View className="space-y-4">
+          <View className="space-y-6 mb-8">
             {/* メールアドレス入力フォーム */}
-            <View className="mb-4">
-              <Text className="text-sm text-gray-500 mb-2">メールアドレス</Text>
+            <View>
+              <Text className="text-sm font-medium text-gray-700 mb-2">メールアドレス</Text>
               <TextInput
-                className={`border border-gray-300 rounded-md p-2" ${
-                  email.length > 0 && !isEmailValid ? 'border-red-500' : 'border-gray-300'
+                className={`bg-gray-50 border rounded-xl p-4 text-base ${
+                  email.length > 0 && !isEmailValid ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="メールアドレスを入力してください"
                 value={email}
@@ -79,63 +86,67 @@ export const SignupScreen = () => {
                 autoComplete="email"
               />
               {email.length > 0 && !isEmailValid && (
-                <Text className="text-red-500 text-sm mt-1">
+                <Text className="text-red-500 text-sm mt-2">
                   メールアドレスの形式が正しくありません
                 </Text>
               )}
             </View>
 
             {/* パスワード入力フォーム */}
-            <View className="mb-4">
-              <Text className="text-sm text-gray-500 mb-2">パスワード</Text>
-              <TextInput
-                className={`border border-gray-300 rounded-md p-2" ${
-                  password.length > 0 && !isPasswordValid ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="8文字以上のパスワード"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                editable={!loading}
-              />
-              <TouchableOpacity
-                className="absolute right-3 top-3"
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Text className="text-gray-500 text-sm">
-                  {showPassword ? '非表示' : '表示'}
+            <View>
+              <Text className="text-sm font-medium text-gray-700 mb-2">パスワード</Text>
+              <View className="relative">
+                <TextInput
+                  className={`bg-gray-50 border rounded-xl p-4 text-base ${
+                    password.length > 0 && !isPasswordValid ? 'border-red-500' : 'border-gray-200'
+                  }`}
+                  placeholder="パスワードを入力してください"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  editable={!loading}
+                />
+                <TouchableOpacity
+                  className="absolute right-4 top-4"
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Text className="text-green-500 font-medium">
+                    {showPassword ? '非表示' : '表示'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {password.length > 0 && !isPasswordValid && (
+                <Text className="text-red-500 text-sm mt-2">
+                  パスワードは8文字以上で入力してください
                 </Text>
-              </TouchableOpacity>
+              )}
             </View>
-            {password.length > 0 && !isPasswordValid && (
-              <Text className="text-red-500 text-sm mt-1">
-                パスワードは8文字以上で入力してください
-              </Text>
-            )}
           </View>
 
           {/* エラーメッセージ */}
           {error && (
-            <Text className="text-red-500 text-sm mt-2 text-center">
-              {error}
-            </Text>
+            <View className="bg-red-50 p-4 rounded-xl mb-6">
+              <Text className="text-red-500 text-sm text-center">
+                {error}
+              </Text>
+            </View>
           )}
 
           {/* 利用規約 */}
-          <View className="mb-4">
-            <Text className="text-sm text-gray-500 mb-2">
+          <View className="mb-8">
+            <Text className="text-sm text-gray-500 text-center">
               アカウントを作成することで、
-              <Text className="text-blue-500">利用規約</Text>
+              <Text className="text-green-500">利用規約</Text>
               および
-              <Text className="text-blue-500">プライバシーポリシー</Text>
+              <Text className="text-green-500">プライバシーポリシー</Text>
               に同意したものとみなされます。
             </Text>
           </View>
 
           {/* 新規登録ボタン */}
           <TouchableOpacity
-            className={`bg-green-500 rounded-md p-3 ${
+            className={`bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 mb-8 shadow-lg ${
               !isEmailValid || !isPasswordValid || loading ? 'opacity-50' : ''
             }`}
             onPress={handleSignup}
@@ -144,19 +155,25 @@ export const SignupScreen = () => {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text className="text-white text-center font-semibold">新規登録</Text>
+              <Text className="text-white text-center font-semibold text-lg">
+                新規登録
+              </Text>
             )}
           </TouchableOpacity>
+
+          {/* フッター */}
+          <View className="items-center">
+            <Text className="text-gray-500 mb-2">既にアカウントをお持ちの方</Text>
+            <TouchableOpacity 
+              className="bg-gray-50 px-6 py-3 rounded-full"
+              onPress={navigateToLogin}
+            >
+              <Text className="text-green-500 font-semibold">
+                ログイン
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        
-        {/*フッター*/}
-        <View className="mt-8 items-center">
-          <Text className="text-gray-600">既にアカウントをお持ちの方</Text>
-          <TouchableOpacity className="mt-2" onPress={navigateToLogin}>
-            <Text className="text-blue-500 font-semibold">ログイン</Text>
-          </TouchableOpacity>
-        </View>
-        
       </ScrollView>
     </KeyboardAvoidingView>
   )

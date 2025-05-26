@@ -11,13 +11,18 @@ const defaultHeaders = {
 
 // アクセストークンを取得する関数
 async function getAuthHeaders(): Promise<HeadersInit> {
-  const token = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
-  if (!token) return defaultHeaders;
+  try {
+    const token = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
+    if (!token) return defaultHeaders;
 
-  return {
-    ...defaultHeaders,
-    'Authorization': `Bearer ${token}`,
-  };
+    return {
+      ...defaultHeaders,
+      'Authorization': `Bearer ${token}`,
+    };
+  } catch (error) {
+    console.error('Error getting auth token:', error);
+    return defaultHeaders;
+  }
 }
 
 // 共通のHTTPリクエストメソッド

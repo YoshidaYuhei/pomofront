@@ -2,25 +2,25 @@ import { useState } from 'react';
 import { post, getDeviceHeaders } from '../lib/apiClient';
 import { setAccessToken } from '../lib/storage';
 
-export type SignupRequest = {
+export type LoginRequest = {
   email: string;
   password: string;
 }
 
-export type SignupResponse = {
+export type LoginResponse = {
   access_token: string;
 }
 
-export function useSignup() {
+export function useLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const signup = async (email: string, password: string, deviceId?: string) => {
+  const login = async (email: string, password: string, deviceId?: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const requestData: SignupRequest = {
+      const requestData: LoginRequest = {
         email,
         password,
       };
@@ -30,8 +30,8 @@ export function useSignup() {
         ? getDeviceHeaders(deviceId)
         : undefined;
 
-      const result = await post<SignupResponse>(
-        '/api/v1/users/signup',
+      const result = await post<LoginResponse>(
+        '/api/v1/users/login',
         requestData,
         headers,
       );
@@ -41,12 +41,12 @@ export function useSignup() {
         await setAccessToken(result.access_token);
       }
 
-      console.log('Signup success');
+      console.log('Login success');
       return result;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
       setError(errorMessage);
-      console.error('Signup failed:', errorMessage);
+      console.error('Login failed:', errorMessage);
       throw error;
     } finally {
       setLoading(false);
@@ -57,5 +57,5 @@ export function useSignup() {
     setError('');
   };
 
-  return { loading, error, signup, clearError };
+  return { loading, error, login, clearError };
 }
